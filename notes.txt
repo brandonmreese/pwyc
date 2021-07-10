@@ -1,0 +1,23 @@
+Will need Square pos-api:
+
+https://developer.squareup.com/docs/pos-api/how-it-works
+
+
+BUSINESS PARAMETERS:
+- minimum "pay what you can" entry (i.e. $3.00)
+- maximum "pay with token" per token (i.e. 1 token covers meal up to $15.00, etc)
+- maximum in-app "pay more amount". i.e. do we want to process very large donations thru this channel or not?
+
+
+Within POS app:
+SETUP: enable open tickets
+
+EACH ORDER:
+add items and click "Save" to create a ticket
+
+
+Extra dev steps:
+npm install -g expo-cli
+npm install @react-navigation/native @react-navigation/stack
+expo install react-native-reanimated react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-community/masked-view
+npm install react-native-currency-input
