@@ -11,93 +11,11 @@ const Stack = createStackNavigator();
 var suggestedTotal;
 var selectedTotal;
 
-const buttonTransition = (props) => {
-  switch(props.selection){
-    case 0:
-      props.navigation.navigate('Start', {suggestedPrice: props.getSuggestedPrice})
-      break;
-    case 1:
-      props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSelectedPrice})
-      break;
-    case 2:
-      break;
-    case 3:
-      break;
-    case 4:
-      break;
-    case 5:
-      break;
-    case 6:
-      break;
-
-  }
-  return (1);
-}
-
-const ChoiceButton = (props) => {
-  return (
-    <View style={styles.buttonContainer}>
-      <Pressable style={styles.button}
-        onPress={() => {
-          props.setSelection(props.index);
-          Alert.alert('Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice)
-          buttonTransition({selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, navigation:props.navigation})
-        }}
-        // disabled={props.getSelection != 0}
-      >
-        <Text style={styles.text}>{props.label}</Text>
-      </Pressable>
-    </View>
-  );
-}
-
-const Logo = (props) => {
+const PageHeader = (props) => {
+  const [getSuggestedPrice, setSuggestedPrice] = useState(props.getSuggestedPrice);
+  const [getSelectedPrice, setSelectedPrice] = useState(props.getSelectedPrice);
   return(
-    <Image
-        source={require('./assets/logo.png')}
-        // TODO: Get permission to use logo
-        style={{width: props.width, height: props.height, marginVertical: 0}}
-      />
-  )
-}
-
-const HomePage = ({ navigation }) => {
-  const [getSelection, setSelection] = useState(0);
-  const [getSuggestedPrice, setSuggestedPrice] = useState(null); // TODO: Fetch order total from SQUARE api
-  return (
-    <View style={styles.container}>
-      <Text style={styles.bigText}>Welcome to</Text>
-      <Logo width={225} height={200}/>
-      <Text style={styles.bigText}>Waiting for transaction...</Text>
-      <SafeAreaView>
-        <CurrencyInput
-          value={getSuggestedPrice}
-          style={styles.inputBasic}
-          onChangeValue={setSuggestedPrice}
-          prefix="$"
-          delimiter=","
-          separator="."
-          keyboardType="numeric"
-          precision={2}
-          onChangeText={(formattedValue) => {
-            console.log(formattedValue);
-          }}
-        />
-      </SafeAreaView>
-      <ChoiceButton
-        label="Submit mock transaction" index={0} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation}
-      />
-    </View>
-  );
-}
-
-const StartPage = ({ navigation, route }) => {
-  const [getSelection, setSelection] = useState(0);
-  const [getSuggestedPrice, setSuggestedPrice] = useState(route.params.suggestedPrice);
-  const [getSelectedPrice, setSelectedPrice] = useState(route.params.suggestedPrice);
-  return (
-    <View style={styles.container}>
-      <View style={styles.containerH}>
+    <View style={styles.containerH}>
         <View style={styles.container}>
           <Text style={styles.totalText}>Suggested Total</Text>
           <CurrencyInput
@@ -134,8 +52,102 @@ const StartPage = ({ navigation, route }) => {
           />
         </View>
       </View>
-        <View style={styles.container}>
-        <ChoiceButton index={1} label={"I want to pay the suggested $"+getSuggestedPrice} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} navigation={navigation} />
+  );
+}
+
+const buttonTransition = (props) => {
+  switch(props.selection){
+    case 0:
+      props.navigation.navigate('Start', {suggestedPrice: props.getSuggestedPrice})
+      break;
+    case 1:
+      props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 5:
+      break;
+    case 6:
+      break;
+
+  }
+  return (1);
+}
+
+const ChoiceButton = (props) => {
+  return (
+    <View style={styles.buttonContainer}>
+      <Pressable style={styles.button}
+        onPress={() => {
+          props.setSelection(props.index);
+          console.log('Before: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
+          buttonTransition({selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, setSelectedPrice: props.setSelectedPrice, navigation:props.navigation})
+          console.log(' After: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
+        }}
+        // disabled={props.getSelection != 0}
+      >
+        <Text style={styles.text}>{props.label}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const Logo = (props) => {
+  return(
+    <Image
+        source={require('./assets/logo.png')}
+        // TODO: Get permission to use logo
+        style={{width: props.width, height: props.height, marginVertical: 0}}
+      />
+  )
+}
+
+const HomePage = ({ navigation }) => {
+  const [getSelection, setSelection] = useState(0);
+  const [getSuggestedPrice, setSuggestedPrice] = useState(null); // TODO: Fetch order total from SQUARE api
+  return (
+    <View style={styles.container}>
+      <Text style={styles.bigText}>Welcome to</Text>
+      <Image
+        source={require('./assets/logo.png')}
+        style={{width: 225, height: 200, marginVertical: 10}}
+      />
+      <Text style={styles.bigText}>Waiting for transaction...</Text>
+      <SafeAreaView>
+        <CurrencyInput
+          value={getSuggestedPrice}
+          style={styles.inputBasic}
+          onChangeValue={setSuggestedPrice}
+          prefix="$"
+          delimiter=","
+          separator="."
+          keyboardType="numeric"
+          precision={2}
+          onChangeText={(formattedValue) => {
+            console.log(formattedValue);
+          }}
+        />
+      </SafeAreaView>
+      <ChoiceButton
+        label="Submit mock transaction" index={0} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation}
+      />
+    </View>
+  );
+}
+
+const StartPage = ({ navigation, route }) => {
+  const [getSelection, setSelection] = useState(0);
+  const [getSuggestedPrice, setSuggestedPrice] = useState(route.params.suggestedPrice);
+  const [getSelectedPrice, setSelectedPrice] = useState(null);
+  return (
+    <View style={styles.container}>
+      <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+      <View style={styles.container}>
+        <ChoiceButton index={1} label={"I want to pay the suggested $"+getSuggestedPrice} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
         <ChoiceButton index={2} label="I want to pay more" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         <ChoiceButton index={3} label="I want to pay less" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         <ChoiceButton index={4} label="I want to pay with a token" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
@@ -152,10 +164,11 @@ const VerificationPage = ({ navigation, route }) => {
   const [getSelectedPrice, setSelectedPrice] = useState(route.params.selectedPrice);
   return (
     <View style={styles.container}>
-      <Text style={styles.bigText}>Welcome to</Text>
-      <Logo width={135} height={120}/>
-      <ChoiceButton index={6} label={"Verify total $"+getSelectedPrice} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
-      <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+      <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+      <View style={styles.container}>
+        <ChoiceButton index={6} label={"Verify total $"+getSelectedPrice} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+      </View>
     </View>
   );
 }
@@ -200,7 +213,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
   },
   buttonContainer: {
-    flex: 1,
+    flex: 0.2,
     width: 640,
     borderRadius: 8,
     marginVertical: 16,
