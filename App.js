@@ -55,6 +55,10 @@ const PageHeader = (props) => {
   );
 }
 
+const centsRound = (amount) => {
+  return (Math.round(amount*100)/100)
+}
+
 const buttonTransition = (props) => {
   switch(props.selection){
     case 0:
@@ -64,7 +68,7 @@ const buttonTransition = (props) => {
       props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
       break;
     case 2:
-      props.navigation.navigate('Selection', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
+      props.navigation.navigate('Selection', {isMore:props.isMore, suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
       break;
     case 3:
       break;
@@ -89,7 +93,7 @@ const ChoiceButton = (props) => {
         onPress={() => {
           props.setSelection(props.index);
           console.log('Before: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
-          buttonTransition({selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, setSelectedPrice: props.setSelectedPrice, navigation:props.navigation})
+          buttonTransition({ isMore: props.isMore, selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, setSelectedPrice: props.setSelectedPrice, navigation:props.navigation})
           console.log(' After: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
         }}
         // disabled={props.getSelection != 0}
@@ -152,8 +156,8 @@ const StartPage = ({ navigation, route }) => {
       <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
       <View style={styles.container}>
         <ChoiceButton index={1} label={"I want to pay the suggested $"+getSuggestedPrice} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
-        <ChoiceButton index={2} label="I want to pay more" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
-        <ChoiceButton index={3} label="I want to pay less" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <ChoiceButton index={2} label="I want to pay more" isMore={true} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
+        <ChoiceButton index={2} label="I want to pay less" isMore={false} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
         <ChoiceButton index={4} label="I want to pay with a token" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         <ChoiceButton index={5} label="I want to volunteer for my meal" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         <StatusBar style="auto" />
@@ -181,15 +185,31 @@ const SelectPricePage = ({ navigation, route }) => {
   const [getSelection, setSelection] = useState(0);
   const [getSuggestedPrice, setSuggestedPrice] = useState(route.params.suggestedPrice);
   const [getSelectedPrice, setSelectedPrice] = useState(route.params.selectedPrice);
-  return (
-    <View style={styles.container}>
-      <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+  if (!route.params.isMore){
+    return (
       <View style={styles.container}>
-        <ChoiceButton index={7} label={"Pay 20% less $"+(getSuggestedPrice*0.8)} getSelectedPrice={(getSuggestedPrice*0.8)} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
-        <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+        <View style={styles.container}>
+          <ChoiceButton index={7} label={"Pay 20% less $"+centsRound(getSuggestedPrice*0.8)} getSelectedPrice={centsRound(getSuggestedPrice*0.8)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
+          <ChoiceButton index={7} label={"Pay 50% less $"+(Math.round(getSuggestedPrice*0.5*100)/100)} getSelectedPrice={Math.round(getSuggestedPrice*0.5*100)/100} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
+          <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
+  else{
+    return (
+      <View style={styles.container}>
+        <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+        <View style={styles.container}>
+          <ChoiceButton index={7} label={"Donate a meal $"+centsRound(getSuggestedPrice + 10)} getSelectedPrice={centsRound(getSuggestedPrice + 10)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
+          <ChoiceButton index={7} label={"Donate 5 meals $"+centsRound(getSuggestedPrice + 50)} getSelectedPrice={centsRound(getSuggestedPrice + 50)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
+          <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        </View>
+      </View>
+    );
+
+  }
 }
 
  const App = () => {
