@@ -64,6 +64,7 @@ const buttonTransition = (props) => {
       props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
       break;
     case 2:
+      props.navigation.navigate('Selection', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
       break;
     case 3:
       break;
@@ -72,6 +73,9 @@ const buttonTransition = (props) => {
     case 5:
       break;
     case 6:
+      break;
+    case 7:
+      props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSelectedPrice})
       break;
 
   }
@@ -173,6 +177,21 @@ const VerificationPage = ({ navigation, route }) => {
   );
 }
 
+const SelectPricePage = ({ navigation, route }) => {
+  const [getSelection, setSelection] = useState(0);
+  const [getSuggestedPrice, setSuggestedPrice] = useState(route.params.suggestedPrice);
+  const [getSelectedPrice, setSelectedPrice] = useState(route.params.selectedPrice);
+  return (
+    <View style={styles.container}>
+      <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+      <View style={styles.container}>
+        <ChoiceButton index={7} label={"Pay 20% less $"+(getSuggestedPrice*0.8)} getSelectedPrice={(getSuggestedPrice*0.8)} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+      </View>
+    </View>
+  );
+}
+
  const App = () => {
   return (
     <NavigationContainer>
@@ -180,6 +199,7 @@ const VerificationPage = ({ navigation, route }) => {
       <Stack.Screen name="Home" component={HomePage} />
       <Stack.Screen name="Start" component={StartPage} />
       <Stack.Screen name="Verification" component={VerificationPage} />
+      <Stack.Screen name="Selection" component={SelectPricePage} />
     </Stack.Navigator>
     </NavigationContainer>
   );
