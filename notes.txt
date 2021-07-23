@@ -2,11 +2,50 @@ Will need Square pos-api:
 
 https://developer.squareup.com/docs/pos-api/how-it-works
 
+SQUARE Meeting
+https://developer.squareup.com/forums/t/api-access-for-tickets/297/10
+
+Orders which have been created.
+
+Variable pricing at the item level, 
+
+Split payments on orders. Experience 
+
+POS add-ons -- exactly what we need -- realistic 6-12 months
+
+Tickets API -- separate release, also similar timeline: 2022
+
+
+TODO:
+- hook up to POS
+-- 
+- input validation
+-- for REST input
+--- check that suggested total is less than some absurd total (i.e. $10,000)
+-- for "pay less"
+--- check minimum $3.00
+--- check for less than suggested
+-- for "pay more"
+--- check for more than suggested
+--- check for less than some absurd total (i.e. $10,000 but check with Maggie, this should be a business parameter)
+- UI cleanup
+-- buttons should fill whole button container box
+- Logging
+-- master logs stored on-device
+-- rolling file appender (deletes old logs as needed)?
+-- email capability?
+-- database storage?
+
 
 BUSINESS PARAMETERS:
 - minimum "pay what you can" entry (i.e. $3.00)
 - maximum "pay with token" per token (i.e. 1 token covers meal up to $15.00, etc)
 - maximum in-app "pay more amount". i.e. do we want to process very large donations thru this channel or not?
+- average cost of a meal (for use in the "donate 1 meal" or "donate 5 meals" quick totals)
+
+
+Requirements needing clarification:
+- do we need a database to keep track of payment selection history? volunteer contact information? is this out of scope? would a daily email be sufficient?
 
 
 Within POS app:

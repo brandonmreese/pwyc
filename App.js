@@ -58,6 +58,13 @@ const PageHeader = (props) => {
 const centsRound = (amount) => {
   return (Math.round(amount*100)/100)
 }
+const centsString = (amount) => {
+  return (amount).toLocaleString(
+    undefined, // leave undefined to use the visitor's browser 
+               // locale or a string like 'en-US' to override it.
+    { minimumFractionDigits: 2 }
+  );
+}
 
 const buttonTransition = (props) => {
   switch(props.selection){
@@ -65,21 +72,23 @@ const buttonTransition = (props) => {
       props.navigation.navigate('Start', {suggestedPrice: props.getSuggestedPrice})
       break;
     case 1:
-      props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
+      props.navigation.navigate('Verification', {verifyText:props.verifyText, suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
       break;
     case 2:
-      props.navigation.navigate('Selection', {isMore:props.isMore, suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSuggestedPrice})
+      props.navigation.navigate('Selection', {isMore:props.isMore, suggestedPrice: props.getSuggestedPrice})
       break;
     case 3:
+      props.navigation.navigate('Verification', {verifyText:props.verifyText, suggestedPrice: props.getSuggestedPrice, selectedPrice: 0})
       break;
     case 4:
       break;
     case 5:
       break;
     case 6:
+      props.navigation.navigate('Confirmation', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSelectedPrice})
       break;
     case 7:
-      props.navigation.navigate('Verification', {suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSelectedPrice})
+      props.navigation.navigate('Verification', {verifyText:props.verifyText, suggestedPrice: props.getSuggestedPrice, selectedPrice: props.getSelectedPrice})
       break;
 
   }
@@ -93,7 +102,7 @@ const ChoiceButton = (props) => {
         onPress={() => {
           props.setSelection(props.index);
           console.log('Before: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
-          buttonTransition({ isMore: props.isMore, selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, setSelectedPrice: props.setSelectedPrice, navigation:props.navigation})
+          buttonTransition({ verifyText: props.verifyText, isMore: props.isMore, selection: props.index, getSuggestedPrice: props.getSuggestedPrice, getSelectedPrice: props.getSelectedPrice, setSelectedPrice: props.setSelectedPrice, navigation:props.navigation})
           console.log(' After: Button with index ' + props.index + ' pressed. Suggested = $' + props.getSuggestedPrice+ ', Selected = $' + props.getSelectedPrice);
         }}
         // disabled={props.getSelection != 0}
@@ -155,11 +164,11 @@ const StartPage = ({ navigation, route }) => {
     <View style={styles.container}>
       <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
       <View style={styles.container}>
-        <ChoiceButton index={1} label={"I want to pay the suggested $"+getSuggestedPrice} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
+        <ChoiceButton index={1} label={"I want to pay the suggested $"+centsString(getSuggestedPrice)} verifyText="Thanks! You've selected the suggested amount." getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
         <ChoiceButton index={2} label="I want to pay more" isMore={true} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
         <ChoiceButton index={2} label="I want to pay less" isMore={false} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} navigation={navigation} />
-        <ChoiceButton index={4} label="I want to pay with a token" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
-        <ChoiceButton index={5} label="I want to volunteer for my meal" getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <ChoiceButton index={3} label="I want to pay with a token" verifyText="You've selected pay with token." getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={0} setSelectedPrice={setSelectedPrice} navigation={navigation} />
+        <ChoiceButton index={3} label="I want to volunteer for my meal" verifyText="You've selected volunteering." getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={0} setSelectedPrice={setSelectedPrice} navigation={navigation} />
         <StatusBar style="auto" />
       </View>
     </View>
@@ -174,7 +183,8 @@ const VerificationPage = ({ navigation, route }) => {
     <View style={styles.container}>
       <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
       <View style={styles.container}>
-        <ChoiceButton index={6} label={"Verify total $"+getSelectedPrice} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
+        <Text style={styles.bigText}>{route.params.verifyText}</Text>
+        <ChoiceButton index={6} label={"Verify total $"+centsString(getSelectedPrice)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} getSelectedPrice={getSelectedPrice} navigation={navigation} />
         <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
       </View>
     </View>
@@ -190,8 +200,8 @@ const SelectPricePage = ({ navigation, route }) => {
       <View style={styles.container}>
         <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
         <View style={styles.container}>
-          <ChoiceButton index={7} label={"Pay 20% less $"+centsRound(getSuggestedPrice*0.8)} getSelectedPrice={centsRound(getSuggestedPrice*0.8)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
-          <ChoiceButton index={7} label={"Pay 50% less $"+(Math.round(getSuggestedPrice*0.5*100)/100)} getSelectedPrice={Math.round(getSuggestedPrice*0.5*100)/100} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
+          <ChoiceButton index={7} label={"Pay 20% less $"+centsString(centsRound(getSuggestedPrice*0.8))} verifyText="Thanks for paying what you can!" getSelectedPrice={centsRound(getSuggestedPrice*0.8)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
+          <ChoiceButton index={7} label={"Pay 50% less $"+centsString(centsRound(getSuggestedPrice*0.5))} verifyText="Thanks for paying what you can!" getSelectedPrice={centsRound(getSuggestedPrice*0.5)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
           <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         </View>
       </View>
@@ -202,14 +212,29 @@ const SelectPricePage = ({ navigation, route }) => {
       <View style={styles.container}>
         <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
         <View style={styles.container}>
-          <ChoiceButton index={7} label={"Donate a meal $"+centsRound(getSuggestedPrice + 10)} getSelectedPrice={centsRound(getSuggestedPrice + 10)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
-          <ChoiceButton index={7} label={"Donate 5 meals $"+centsRound(getSuggestedPrice + 50)} getSelectedPrice={centsRound(getSuggestedPrice + 50)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
+          <ChoiceButton index={7} label={"Donate a meal $"+centsRound(getSuggestedPrice + 10)} verifyText="Thank you for paying it forward!" getSelectedPrice={centsRound(getSuggestedPrice + 10)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} setSelectedPrice={setSelectedPrice}navigation={navigation} />
+          <ChoiceButton index={7} label={"Donate 5 meals $"+centsRound(getSuggestedPrice + 50)} verifyText="Thank you for paying it forward!" getSelectedPrice={centsRound(getSuggestedPrice + 50)} getSelection={getSelection} setSelection={setSelection} getSuggestedPrice={getSuggestedPrice} navigation={navigation} />
           <ChoiceButton index={0} label={"Go back"} getSelection={getSelection} setSelection={setSelection} navigation={navigation} />
         </View>
       </View>
     );
 
   }
+}
+
+
+
+const ConfirmationPage = ({ navigation, route }) => {
+  const [getSuggestedPrice, setSuggestedPrice] = useState(route.params.suggestedPrice);
+  const [getSelectedPrice, setSelectedPrice] = useState(route.params.selectedPrice);
+  return (
+    <View style={styles.container}>
+      <PageHeader getSuggestedPrice={getSuggestedPrice} setSuggestedPrice={setSuggestedPrice} getSelectedPrice={getSelectedPrice} setSelectedPrice={setSelectedPrice} />
+      <View style={styles.container}>
+        <Text style={styles.bigText}>Thank you! Please see cashier to continue.</Text>
+      </View>
+    </View>
+  );
 }
 
  const App = () => {
@@ -220,19 +245,10 @@ const SelectPricePage = ({ navigation, route }) => {
       <Stack.Screen name="Start" component={StartPage} />
       <Stack.Screen name="Verification" component={VerificationPage} />
       <Stack.Screen name="Selection" component={SelectPricePage} />
+      <Stack.Screen name="Confirmation" component={ConfirmationPage} />
     </Stack.Navigator>
     </NavigationContainer>
   );
-  // const [getPage, setPage] = useState("verification");
-  // switch(getPage){
-  //   case "start":
-  //   return (StartPage());
-  //   case "verification":
-  //   return (VerificationPage({selectedTotal:10.55}));
-  //   case "home":
-  //   return (HomePage());
-  // }
-  // return (null);
 }
 
 export default App;
